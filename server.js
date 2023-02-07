@@ -1,6 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 
+// Parse database
+const databaseRaw = fs.readFileSync('database.json')
+const database = JSON.parse(databaseRaw)
+
 const server = http.createServer((request, response) => {
   response.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
   response.setHeader('Content-Type', 'text/plain');
@@ -13,9 +17,6 @@ const server = http.createServer((request, response) => {
     }).on('end', () => {
       likesCountUpdated = Buffer.concat(body).toString()
 
-      // Parse database
-      const databaseRaw = fs.readFileSync('database.json')
-      const database = JSON.parse(databaseRaw)
       // Write to database
       database.likesCount = likesCountUpdated
       const databaseRawToWrite = JSON.stringify(database)
@@ -24,7 +25,7 @@ const server = http.createServer((request, response) => {
       response.end('Updated likes count: ' + database.likesCount);
     })
   } else {
-    response.end('Hello World');
+    response.end(database.likesCount);
   }
 });
 const port = 8000;
