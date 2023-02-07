@@ -12,13 +12,16 @@ const server = http.createServer((request, response) => {
       body.push(chunk)
     }).on('end', () => {
       likesCountUpdated = Buffer.concat(body).toString()
-      fs.writeFile('likesCount.txt', likesCountUpdated, err => {
-        if (err) {
-          console.error(err);
-        }
-      });
 
-      response.end('Updated likes count: ' + likesCountUpdated);
+      // Parse database
+      const databaseRaw = fs.readFileSync('database.json')
+      const database = JSON.parse(databaseRaw)
+      // Write to database
+      database.likesCount = likesCountUpdated
+      const databaseRawToWrite = JSON.stringify(database)
+      fs.writeFileSync('database.json', databaseRawToWrite)
+
+      response.end('Updated likes count: ' + database.likesCount);
     })
   } else {
     response.end('Hello World');
